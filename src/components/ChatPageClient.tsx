@@ -1,0 +1,164 @@
+"use client";
+
+import { useState } from "react";
+import { List, FileText, MessageSquare } from "lucide-react";
+import ChatComponent from "./ChatComponent";
+import ChatSideBar from "./ChatSideBar";
+import PDFViewer from "./PDFViewer";
+import DocuchatLogo from "./DocuchatLogo";
+
+type Chat = {
+  id: string;
+  pdfName: string;
+  pdfUrl: string;
+  userId: string;
+  fileKey: string;
+  createdAt: Date;
+};
+
+type ActivePanel = "sidebar" | "viewer" | "chat";
+
+type Props = {
+  chats: Chat[];
+  currentChat: Chat;
+};
+
+const NoPdfState = () => (
+  <div className="flex-1 flex flex-col items-center justify-center gap-3">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"
+        stroke="#7EC8E3"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <polyline
+        points="16,6 12,2 8,6"
+        stroke="#F97316"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <line x1="12" y1="2" x2="12" y2="15" stroke="#F97316" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+    <p className="text-sm text-gray-400">No PDF loaded</p>
+  </div>
+);
+
+const ChatPageClient = ({ chats, currentChat }: Props) => {
+  const [activePanel, setActivePanel] = useState<ActivePanel>("chat");
+  const hasPdf = !!currentChat.pdfUrl;
+
+  const tabs: { key: ActivePanel; label: string; icon: React.ReactNode }[] = [
+    {
+      key: "sidebar",
+      label: "Chats",
+      icon: <List className="w-5 h-5" />,
+    },
+    {
+      key: "viewer",
+      label: "PDF",
+      icon: (
+        <span className="relative">
+          <FileText className="w-5 h-5" />
+          {hasPdf && (
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#F97316] rounded-full" />
+          )}
+        </span>
+      ),
+    },
+    {
+      key: "chat",
+      label: "Ask",
+      icon: <MessageSquare className="w-5 h-5" />,
+    },
+  ];
+
+  return (
+    <>
+      {/* Desktop layout — unchanged */}
+      <div className="hidden md:flex max-h-screen overflow-auto bg-gradient-to-tr from-orange-200 to-sky-200">
+        <div className="flex w-full max-h-screen overflow-auto">
+          <div className="flex-[1] max-w-xs">
+            <ChatSideBar chats={chats} chatId={currentChat.id} />
+          </div>
+          <div className="max-h-screen p-4 overflow-auto flex-[5]">
+            {hasPdf && (
+              <PDFViewer pdf_url={currentChat.pdfUrl.replaceAll(" ", "+")} />
+            )}
+          </div>
+          <div className="flex-[3] border-l-4 border-l-slate-300">
+            <ChatComponent chatId={currentChat.id} />
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile layout — tab-based panel switcher */}
+      <div className="flex flex-col h-screen md:hidden">
+        <div className="flex-1 overflow-hidden">
+          {activePanel === "sidebar" && (
+            <ChatSideBar chats={chats} chatId={currentChat.id} />
+          )}
+
+          {activePanel === "viewer" && (
+            <div className="w-full h-full flex flex-col">
+              <div className="px-4 py-2 border-b border-gray-200 text-sm text-gray-600 truncate shrink-0">
+                {currentChat.pdfName}
+              </div>
+              {hasPdf ? (
+                <div className="flex-1 overflow-hidden">
+                  <PDFViewer pdf_url={currentChat.pdfUrl.replaceAll(" ", "+")} />
+                </div>
+              ) : (
+                <NoPdfState />
+              )}
+            </div>
+          )}
+
+          {activePanel === "chat" && (
+            <div className="w-full h-full flex flex-col">
+              {hasPdf && (
+                <button
+                  onClick={() => setActivePanel("viewer")}
+                  className="flex justify-center text-xs text-sky-500 underline text-center py-2 border-b border-gray-100 w-full shrink-0"
+                >
+                  <div className="flex items-center gap-2"><DocuchatLogo showText={false} /> View PDF →</div>
+                </button>
+              )}
+              <div className="flex-1 overflow-hidden">
+                <ChatComponent chatId={currentChat.id} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom tab bar */}
+        <nav
+          className="flex items-stretch border-t border-gray-200 bg-white shrink-0"
+          style={{ height: "64px", paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
+          {tabs.map(({ key, label, icon }) => {
+            const isActive = activePanel === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setActivePanel(key)}
+                className="flex-1 flex flex-col items-center justify-center gap-1 text-xs"
+                style={{
+                  color: isActive ? "#F97316" : "#9ca3af",
+                  borderTop: isActive ? "2px solid #F97316" : "2px solid transparent",
+                }}
+              >
+                {icon}
+                {label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    </>
+  );
+};
+
+export default ChatPageClient;

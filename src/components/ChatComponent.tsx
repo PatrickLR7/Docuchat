@@ -56,7 +56,7 @@ const ChatInner = ({
   return (
     <div
       ref={containerRef}
-      className="flex flex-col relative min-h-screen max-h-screen overflow-auto bg-transparent"
+      className="flex flex-col relative h-full overflow-auto bg-transparent"
       id="message-container"
     >
       <div className="sticky top-0 inset-x-0 p-2 h-fit">
