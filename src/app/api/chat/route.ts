@@ -9,23 +9,23 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const { messages, chatId } = await req.json();
-    
+
     // Fetch chat from new Supabase schema
     const _chat = await db.select().from(chats).where(eq(chats.id, chatId));
-    
+
     if (_chat.length === 0) {
       return NextResponse.json({ error: "Chat not found." }, { status: 404 });
     }
     const currentChat = _chat[0];
     const fileKey = currentChat.fileKey;
     const lastMessage = messages[messages.length - 1];
-    
+
     // Extract text content from UIMessage parts (AI SDK v4 format)
     const lastMessageText = lastMessage.parts
       ?.filter((p: { type: string }) => p.type === "text")
       .map((p: { type: string; text?: string }) => p.text ?? "")
       .join("") ?? lastMessage.content ?? "";
-    
+
     // Get context from pgvector
     const context = await getContext(lastMessageText, fileKey);
 
@@ -65,9 +65,9 @@ export async function POST(req: Request) {
         .join("") ?? msg.content ?? "",
     }));
 
-    // Call Bedrock Claude 3 Haiku
+    // Call Bedrock Claude 3.5 Haiku (current active model)
     const result = await streamText({
-      model: bedrock("anthropic.claude-3-haiku-20240307-v1:0"),
+      model: bedrock("us.anthropic.claude-haiku-4-5-20251001-v1:0"),
       system: systemPrompt,
       messages: coreMessages,
       onFinish: async ({ text }) => {
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
           await db.insert(messagesTable).values({
             chatId: currentChat.id,
             content: text,
-            role: "assistant", 
+            role: "assistant",
           });
         } catch (error) {
           console.log("System message insert error: ", error);
