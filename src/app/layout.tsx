@@ -9,9 +9,8 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Chat with PDFs",
-  description:
-    "A Next.Js app built using Amazon Bedrock, Supabase, Drizzle ORM, and the AI SDK to chat with PDFs.",
+  title: "Docuchat — Chat with any PDF",
+  description: "Drop a PDF and ask questions. Powered by RAG.",
   authors: {
     name: "PatrickLR7",
     url: "https://github.com/PatrickLR7",
