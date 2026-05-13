@@ -4,7 +4,7 @@ A powerful, full-stack AI application that allows you to upload PDF documents an
 
 ## 🚀 Screenshots
 
-![Landing Page](./public/screenshots/landing.png)
+![Landing Page](./public/screenshots/new-landing.png)
 *Modern, responsive landing page with easy PDF uploads.*
 
 ![Chat Interface](./public/screenshots/chat.png)

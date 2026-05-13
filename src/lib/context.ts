@@ -22,11 +22,11 @@ export async function getMatchesFromQuery(query: string, fileKey: string) {
       content: vectors.content,
       similarity: similarityQuery,
     })
-    .from(vectors)
-    .where(eq(vectors.fileKey, fileKey))
-    // we use `orderBy` on the distance itself to get the closest matches
-    .orderBy((t) => desc(t.similarity))
-    .limit(5);
+      .from(vectors)
+      .where(eq(vectors.fileKey, fileKey))
+      // we use `orderBy` on the distance itself to get the closest matches
+      .orderBy((t) => desc(t.similarity))
+      .limit(5);
 
     return matches;
   } catch (error) {
@@ -38,10 +38,7 @@ export async function getMatchesFromQuery(query: string, fileKey: string) {
 export async function getContext(query: string, fileKey: string) {
   const matches = await getMatchesFromQuery(query, fileKey);
 
-  // Filter out low scores (Titan distance scores will vary, 0.4 is a safe starting threshold)
-  const qualifyingDocs = matches.filter((match) => match.similarity > 0.4);
-
-  let docs = qualifyingDocs.map((match) => match.content);
+  let docs = matches.map((match) => match.content);
   // Max 3000 chars for context window
   return docs.join("\n").substring(0, 3000);
 }
