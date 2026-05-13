@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { List, FileText, MessageSquare } from "lucide-react";
+import { List, FileText, MessageSquare, ChevronLeft, Menu } from "lucide-react";
 import ChatComponent from "./ChatComponent";
 import ChatSideBar from "./ChatSideBar";
 import PDFViewer from "./PDFViewer";
@@ -48,6 +48,7 @@ const NoPdfState = () => (
 
 const ChatPageClient = ({ chats, currentChat }: Props) => {
   const [activePanel, setActivePanel] = useState<ActivePanel>("chat");
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
   const hasPdf = !!currentChat.pdfUrl;
 
   const tabs: { key: ActivePanel; label: string; icon: React.ReactNode }[] = [
@@ -77,18 +78,39 @@ const ChatPageClient = ({ chats, currentChat }: Props) => {
 
   return (
     <>
-      {/* Desktop layout — unchanged */}
-      <div className="hidden md:flex max-h-screen overflow-auto bg-gradient-to-tr from-orange-200 to-sky-200">
-        <div className="flex w-full max-h-screen overflow-auto">
-          <div className="flex-[1] max-w-xs">
+      {/* Desktop layout */}
+      <div className="hidden md:flex h-screen bg-gradient-to-tr from-orange-200 to-sky-200 overflow-hidden relative">
+        {/* Sidebar */}
+        <div
+          className={`transition-all duration-300 ease-in-out overflow-hidden z-10 ${isSidebarOpen ? "w-72 flex-shrink-0" : "w-0"
+            }`}
+        >
+          <div className="w-72 h-full shadow-lg">
             <ChatSideBar chats={chats} chatId={currentChat.id} />
           </div>
-          <div className="max-h-screen p-4 overflow-auto flex-[5]">
+        </div>
+
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className={`absolute z-20 top-10 transition-all duration-300 ease-in-out bg-orange-600 p-1.5 rounded-r-md shadow-md text-white hover:bg-orange-700 focus:outline-none ${isSidebarOpen ? "left-72" : "left-0"
+            }`}
+          title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+        >
+          {isSidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex h-full">
+          {/* PDF Viewer */}
+          <div className="flex-[4] h-full overflow-hidden">
             {hasPdf && (
               <PDFViewer pdf_url={currentChat.pdfUrl.replaceAll(" ", "+")} />
             )}
           </div>
-          <div className="flex-[3] border-l-4 border-l-slate-300">
+
+          {/* Chat Component */}
+          <div className="flex-[3] h-full border-l-4 border-slate-300 bg-white overflow-hidden shadow-xl">
             <ChatComponent chatId={currentChat.id} />
           </div>
         </div>
@@ -118,14 +140,6 @@ const ChatPageClient = ({ chats, currentChat }: Props) => {
 
           {activePanel === "chat" && (
             <div className="w-full h-full flex flex-col">
-              {hasPdf && (
-                <button
-                  onClick={() => setActivePanel("viewer")}
-                  className="flex justify-center text-xs text-sky-500 underline text-center py-2 border-b border-gray-100 w-full shrink-0"
-                >
-                  <div className="flex items-center gap-2"><DocuchatLogo showText={false} /> View PDF →</div>
-                </button>
-              )}
               <div className="flex-1 overflow-hidden">
                 <ChatComponent chatId={currentChat.id} />
               </div>

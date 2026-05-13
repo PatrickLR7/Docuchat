@@ -18,7 +18,7 @@ const MessageList = ({ messages, isLoading, completionLoading }: Props) => {
     );
   if (!messages) return <></>;
   return (
-    <div className="flex flex-col gap-2 px-4 max-h-[90%] overflow-y-auto mb-auto">
+    <div className="flex flex-col gap-2 px-4 pb-4">
       {messages.map((message) => {
         return (
           <div
