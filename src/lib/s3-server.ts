@@ -31,7 +31,7 @@ export async function downloadFromS3(
     const obj = await s3.getObject(params).promise();
     const file = {
       fileName: file_key,
-      blob: new Blob([obj.Body as Buffer]),
+      blob: new Blob([obj.Body as any]),
     };
     return file;
   } catch (error) {
