@@ -22,6 +22,7 @@ const MessageList = ({ messages, isLoading, completionLoading }: Props) => {
       {messages.map((message) => {
         return (
           <div
+            key={message.id}
             className={cn("flex", {
               "justify-end pl-10": message.role === "user",
               "justify-start pr-10": message.role === "assistant",
