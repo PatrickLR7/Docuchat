@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { type UIMessage } from "@ai-sdk/react";
 import Loader from "./Loader";
+import ReactMarkdown from "react-markdown";
 
 type Props = {
   messages: UIMessage[];
@@ -35,10 +36,22 @@ const MessageList = ({ messages, isLoading, completionLoading }: Props) => {
                 }
               )}
             >
-              <div className="flex flex-col">
+              <div className="flex flex-col w-full overflow-hidden">
                 {message.parts?.map((part, i) => {
                   if (part.type === "text") {
-                    return <p key={i}>{part.text}</p>;
+                    return (
+                      <div
+                        key={i}
+                        className={cn("prose prose-sm max-w-none break-words", {
+                          "prose-invert": message.role === "user",
+                          "text-white": message.role === "user",
+                        })}
+                      >
+                        <ReactMarkdown>
+                          {part.text}
+                        </ReactMarkdown>
+                      </div>
+                    );
                   }
                   return null;
                 })}
