@@ -5,7 +5,6 @@ import { List, FileText, MessageSquare, ChevronLeft, Menu } from "lucide-react";
 import ChatComponent from "./ChatComponent";
 import ChatSideBar from "./ChatSideBar";
 import PDFViewer from "./PDFViewer";
-import DocuchatLogo from "./DocuchatLogo";
 
 type Chat = {
   id: string;
@@ -93,7 +92,7 @@ const ChatPageClient = ({ chats, currentChat }: Props) => {
         {/* Toggle Button */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className={`absolute z-20 top-10 transition-all duration-300 ease-in-out bg-orange-600 p-1.5 rounded-r-md shadow-md text-white hover:bg-orange-700 focus:outline-none ${isSidebarOpen ? "left-72" : "left-0"
+          className={`absolute z-20 top-[3.1rem] transition-all duration-300 ease-in-out bg-orange-600 p-1.5 rounded-r-md shadow-md text-white hover:bg-orange-700 focus:outline-none ${isSidebarOpen ? "left-72" : "left-0"
             }`}
           title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
