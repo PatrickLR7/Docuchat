@@ -3,6 +3,16 @@
 import axios from "axios";
 import Loader from "./Loader";
 import { useQuery } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
+
+const PDFViewerEmbed = dynamic(() => import("./PDFViewerEmbed"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <Loader />
+    </div>
+  ),
+});
 
 type Props = {
   pdf_url: string;
@@ -25,12 +35,15 @@ const PDFViewer = ({ pdf_url }: Props) => {
   });
 
   const fileUrl = blob ? URL.createObjectURL(blob) : "";
+
   return (
-    <div className="w-full h-full flex justify-center items-center">
-      {isLoading ? (
-        <Loader />
+    <div className="w-full h-full">
+      {isLoading || !fileUrl ? (
+        <div className="w-full h-full flex items-center justify-center">
+          <Loader />
+        </div>
       ) : (
-        <object data={fileUrl} className="w-full h-full" />
+        <PDFViewerEmbed fileUrl={fileUrl} />
       )}
     </div>
   );

@@ -1,6 +1,8 @@
-# Chat with Any PDF - AI SDK & RAG
+# Docuchat - Chat with Any PDF - AI SDK & RAG
 
 A powerful, full-stack AI application that allows you to upload PDF documents and have intelligent conversations about their content. Leveraging Retrieval-Augmented Generation (RAG) for accurate, context-aware responses.
+
+See demo at: [https://docuchat-green.vercel.app/](https://docuchat-green.vercel.app/) (requires authentication, if you'd like a demo, please contact me).
 
 ## 🚀 Screenshots
 
