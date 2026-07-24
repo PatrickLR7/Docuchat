@@ -5,7 +5,7 @@ import { bedrock } from "@ai-sdk/amazon-bedrock";
 import { embedMany } from "ai";
 import { db } from "./db";
 import { vectors } from "./db/schema";
-import { downloadFromS3 } from "./s3-server";
+import { downloadFromS3 } from "./s3";
 
 type PDFPage = {
   pageContent: string;

@@ -1,6 +1,5 @@
 "use client";
 
-import { getS3Url, uploadToS3 } from "@/lib/s3";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
@@ -63,7 +62,10 @@ const FileUpload = (props: FileUploadProps) => {
       }
 
       try {
-        const data = await uploadToS3(file);
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", file);
+        const { data } = await axios.post("/api/upload", uploadFormData);
+
         if (!data?.file_key || !data.file_name) {
           toast.error("Something went wrong");
           return;
@@ -78,9 +80,6 @@ const FileUpload = (props: FileUploadProps) => {
               toast.error("Error creating chat");
             },
           });
-          const url = getS3Url(data.file_key);
-          console.log(url);
-          return url;
         }
       } catch (e) {
         console.log(e);

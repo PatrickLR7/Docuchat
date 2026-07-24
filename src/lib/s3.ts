@@ -1,34 +1,46 @@
+import "server-only";
 import AWS from "aws-sdk";
+
+export interface S3FileBlob {
+  fileName: string;
+  blob: Blob;
+}
+
+function getS3Client() {
+  AWS.config.update({
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "",
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
+    },
+  });
+
+  return new AWS.S3({
+    params: {
+      Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+    },
+    region: process.env.AWS_REGION ?? "us-east-1",
+  });
+}
 
 export async function uploadToS3(file: File) {
   try {
-    AWS.config.update({
-      credentials: {
-        accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ?? "",
-        secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ?? "",
-      },
-    });
-
-    const s3 = new AWS.S3({
-      params: {
-        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-      },
-      region: "us-east-1",
-    });
+    const s3 = getS3Client();
 
     const file_key = `uploads/${Date.now().toString()}${file.name.replace(
       " ",
       "-"
     )}`;
 
+    const body = Buffer.from(await file.arrayBuffer());
+
     const params: AWS.S3.PutObjectRequest = {
       Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
       Key: file_key,
-      Body: file,
+      Body: body,
       ContentType: "application/pdf",
     };
 
-    const upload = await s3
+    await s3
       .putObject(params)
       .on("httpUploadProgress", (evt) => {
         console.log(
@@ -55,17 +67,7 @@ export function getS3Url(file_key: string) {
 }
 
 export async function deleteFromS3(file_key: string) {
-  AWS.config.update({
-    credentials: {
-      accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID ?? "",
-      secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY ?? "",
-    },
-  });
-
-  const s3 = new AWS.S3({
-    params: { Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME },
-    region: "us-east-1",
-  });
+  const s3 = getS3Client();
 
   await s3
     .deleteObject({
@@ -73,4 +75,26 @@ export async function deleteFromS3(file_key: string) {
       Key: file_key,
     })
     .promise();
+}
+
+export async function downloadFromS3(
+  file_key: string
+): Promise<S3FileBlob | null> {
+  try {
+    const s3 = getS3Client();
+
+    const params = {
+      Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
+      Key: file_key,
+    };
+
+    const obj = await s3.getObject(params).promise();
+    return {
+      fileName: file_key,
+      blob: new Blob([obj.Body as any]),
+    };
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
